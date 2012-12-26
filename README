@@ -1,10 +1,10 @@
-Version 1.0.3
+Version 1.0.3.1
 
 Changes in this version
 - Fixed bug in viewing associative array names / children
 - Fixed bug in restoring MiniBufExplorer on quit
 - Removed mappings in .vim file for function keys (use your own)
-- Added plugin folder support for Pathogen setups (assuming folder name)
+- Added plugin folder support for Pathogen setups
 
 based on a fork from Hadi Zeftin
 https://github.com/vim-scripts/DBGp-Remote-Debugger-Interface
