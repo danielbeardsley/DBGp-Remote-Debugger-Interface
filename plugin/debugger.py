@@ -5,6 +5,7 @@
 #    Seung Woo Shin <segv <at> sayclub.com>
 #    Sam Ghods <sam <at> box.net>
 #    Hadi Zeftin <slack.dna <at> gmail.com>
+#    Jared Cobb <github <at> jaredcobb.com>
 
 """
 	debugger.py -- DBGp client: a remote debugger interface to DBGp protocol
@@ -31,6 +32,11 @@ import base64
 import traceback
 import xml.dom.minidom
 import urllib
+
+#import logging
+#logging.basicConfig(filename='debugger.log',level=logging.DEBUG,format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+#output = vars(self)
+#logging.info(output)
 
 #######################################################################################################################
 #                                                                                                                     #
@@ -329,10 +335,11 @@ class WatchWindow(VimWindow):
 
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
+
       if name == '':
         name = 'EVAL_RESULT'
       if fullname == '':
-        fullname = 'EVAL_RESULT'
+        fullname = name
 
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
@@ -500,8 +507,6 @@ class DebugUI:
     if self.usesessiontab == 1:
       vim.command('set sessionoptions+=tabpages')
     self.winbuf.clear()
-    if self.minibufexpl == 1:
-      vim.command('MiniBufExplorer')         # restore minibufexplorer
 
 
   def create(self):
@@ -708,6 +713,7 @@ class Debugger:
     self.max_children  = max_children
     self.max_data      = max_data
     self.max_depth     = max_depth
+    self.minibufexpl   = minibufexpl
 
     self.protocol   = DbgProtocol(self.port)
 
@@ -988,6 +994,9 @@ class Debugger:
 
     self.ui.normal_mode()
     self.clear()
+
+    if self.minibufexpl:
+      vim.command('MiniBufExplorer')         # restore minibufexplorer
 
   def stop(self):
     #if self.running == 0:

@@ -1,4 +1,13 @@
 ###############################################################################
+1.0.3 changelog from 1.0.2
+###############################################################################
+
+- Fixed bug in viewing associative array names / children
+- Fixed bug in restoring MiniBufExplorer on quit
+- Removed mappings in .vim file for function keys (use your own)
+- Added plugin folder support for Pathogen setups (assuming folder name)
+
+###############################################################################
 1.0.2 changelog from 1.0.1
 ###############################################################################
 

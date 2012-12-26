@@ -5,33 +5,70 @@
 "=============================================================================
 " Name Of File: debugger.vim, debugger.py
 "  Description: remote debugger client/interface to DBGp protocol
-"   Maintainer: Hadi Zeftin <slack.dna <at> gmail.com>
-"  Last Change: January 7, 2009
+"  Maintainer: Jared Cobb <github <at> jaredcobb.com>
+"  Last Change: December 26th 2012
 "          URL: http://www.vim.org/scripts/script.php?script_id=2508
-"      Version: 1.0.2
+"      Version: 1.0.3
+"				Changelog for 1.0.3
+"				- Fixed bug in viewing associative array names / children
+"				- Fixed bug in restoring MiniBufExplorer on quit
+"				- Removed mappings in .vim file for function keys (use your own)
+"				- Added plugin folder support for Pathogen setups (assuming folder name)
+"
+"				Forked by Hadi Zeftin <slack.dna <at> gmail.com>
+"				Changed on January 7, 2009
 "               Originally written by Seung Woo Shin <segv <at> sayclub.com>
 "               at	http://www.vim.org/scripts/script.php?script_id=1152
 "               Developed by Sam Ghods <sam <at> box.net>
 "               at http://www.vim.org/scripts/script.php?script_id=1929
 "        Usage: 
-"               to set the socket waiting time before timeout(default 
-"               5 second) use :
+"
+"				Map your preferred shortcuts to the following plugin functions
+"				(copy/paste these into your .vimrc, some people like F keys,
+"				I preferred leader keys)
+"				
+"				map <leader>1 :python debugger_resize()<cr>
+"				map <leader>2 :python debugger_command('step_into')<cr>
+"				map <leader>3 :python debugger_command('step_over')<cr>
+"				map <leader>4 :python debugger_command('step_out')<cr>
+"				map <leader>5 :python debugger_run()<cr>
+"				map <leader>6 :python debugger_quit<cr>
+"				map <leader>9 :python debugger_context()<cr>
+"				map <leader>0 :python debugger_property()<cr>
+"				map <leader>9 :python debugger_watch_input("context_get")<cr>A<cr>
+"				map <leader>0 :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+"				map <leader>b :Bp<cr>
+"				
+"				OR
+"				
+"				map <F1> :python debugger_resize()<cr>
+"				map <F2> :python debugger_command('step_into')<cr>
+"				map <F3> :python debugger_command('step_over')<cr>
+"				map <F4> :python debugger_command('step_out')<cr>
+"				map <F5> :python debugger_run()<cr>
+"				map <F6> :python debugger_quit()<cr>
+"				map <F11> :python debugger_context()<cr>
+"				map <F12> :python debugger_property()<cr>
+"				map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
+"				map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+"				map <leader>b :Bp<cr>
+"
+"               To set the socket waiting time before timeout(default 
+"               10 second) use :
 "               
 "                 let g:debuggerTimeout = 10
-"
-"               above snippet use 10 second 
 "
 "               By default the script will create a dedicated tab for each 
 "               debugging session, 
 "
 "                 let g:debuggerDedicatedTab = 1
 "
-"               if you dont want a dedicated tab for each debugging session
-"               change it to 0, remember you would lost undo history on that
+"               If you don't want a dedicated tab for each debugging session
+"               change it to 0, remember you will lose undo history on that
 "               tab!
 "
-"               note : 
-"               if you are using gVim/vim.gui and want to use a dedicated tab 
+"               Note : 
+"               If you are using gVim/vim.gui and want to use a dedicated tab 
 "               make sure to always show tab
 "
 "               if has("gui_running")
@@ -40,7 +77,7 @@
 "                 endif
 "               endif
 "
-"               put the snippet above on your ~/.vimrc file, this is
+"               Put the snippet above on your ~/.vimrc file, this is
 "               regarding the resize bug on vim with gtk
 "
 "
@@ -119,6 +156,8 @@ endif
 
 if filereadable($VIMRUNTIME."/plugin/debugger.py")
   pyfile $VIMRUNTIME/plugin/debugger.py
+elseif filereadable($HOME."/.vim/bundle/DBGp-Remote-Debugger-Interface/plugin/debugger.py")
+  pyfile $HOME/.vim/bundle/DBGp-Remote-Debugger-Interface/plugin/debugger.py
 elseif filereadable($HOME."/.vim/plugin/debugger.py")
   pyfile $HOME/.vim/plugin/debugger.py
 elseif filereadable($VIM."/vimfiles/plugin/debugger.py")
@@ -127,22 +166,7 @@ else
   call confirm('debugger.vim: Unable to find debugger.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
 endif
 
-
-"=============================================================================
-" map debugging function keys
-"=============================================================================
-map <F1> :python debugger_resize()<cr>
-map <F2> :python debugger_command('step_into')<cr>
-map <F3> :python debugger_command('step_over')<cr>
-map <F4> :python debugger_command('step_out')<cr>
-map <F5> :call <SID>startDebugging()<cr>
-map <F6> :call <SID>stopDebugging()<cr>
-map <F11> :python debugger_context()<cr>
-map <F12> :python debugger_property()<cr>
-map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
-map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
 nnoremap ,e :python debugger_watch_input("eval")<cr>A
-
 
 "=============================================================================
 " Initialization
@@ -180,23 +204,6 @@ endif
 if !exists('g:debuggerDebugMode')
     let g:debuggerDebugMode = 0
 endif
-
-
-
-"=============================================================================
-" Debugging functions
-"=============================================================================
-
-function! s:startDebugging()
-        python debugger_run()
-endfunction
-
-function! s:stopDebugging()
-        python debugger_quit()
-        " if your code goes weird re-source your syntax file, or any other
-        " cleanups here
-        "source ~/.vim/plugin/torte.vim 
-endfunction
 
 "=============================================================================
 " Init Debugger python script
