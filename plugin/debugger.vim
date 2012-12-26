@@ -153,11 +153,10 @@ if !has("python")
     finish
 endif
 
-
-if filereadable($VIMRUNTIME."/plugin/debugger.py")
+if filereadable(expand("<sfile>:p:h")."/debugger.py")
+  execute "pyfile " . expand("<sfile>:p:h")."/debugger.py"
+elseif filereadable($VIMRUNTIME."/plugin/debugger.py")
   pyfile $VIMRUNTIME/plugin/debugger.py
-elseif filereadable($HOME."/.vim/bundle/DBGp-Remote-Debugger-Interface/plugin/debugger.py")
-  pyfile $HOME/.vim/bundle/DBGp-Remote-Debugger-Interface/plugin/debugger.py
 elseif filereadable($HOME."/.vim/plugin/debugger.py")
   pyfile $HOME/.vim/plugin/debugger.py
 elseif filereadable($VIM."/vimfiles/plugin/debugger.py")
