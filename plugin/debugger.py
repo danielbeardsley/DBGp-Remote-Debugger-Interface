@@ -407,7 +407,7 @@ class HelpWindow(VimWindow):
 
 class DebugUI:
   """ DEBUGUI class """
-  def __init__(self, debugger, dedicatedtab, minibufexpl = 0):
+  def __init__(self, debugger, dedicatedtab, minibufexpl = 0, disablehelppane = 0):
     """ initialize object """
     self.debugger = debugger
     self.watchwin = WatchWindow(self)
@@ -421,6 +421,7 @@ class DebugUI:
     self.cursign  = None
     self.sessfile = "/tmp/debugger_vim_saved_session." + str(os.getpid())
     self.minibufexpl = minibufexpl
+    self.disablehelppane = disablehelppane
     # tab stuff
     self.dedicatedtab = dedicatedtab
     self.origintab = 0
@@ -512,7 +513,8 @@ class DebugUI:
   def create(self):
     """ create windows """
     self.watchwin.create('vertical belowright new')
-    self.helpwin.create('belowright new')
+    if self.disablehelppane == 0:
+      self.helpwin.create('belowright new')
     self.stackwin.create('belowright new')
     if self.debugger.debug:
         self.tracewin.create('belowright new')
@@ -524,7 +526,8 @@ class DebugUI:
 
   def destroy(self):
     """ destroy windows """
-    self.helpwin.destroy()
+    if self.disablehelppane == 0:
+      self.helpwin.destroy()
     self.watchwin.destroy()
     self.stackwin.destroy()
     if self.debugger.debug:
@@ -693,7 +696,7 @@ class Debugger:
   #################################################################################################################
   # Internal functions
   #
-  def __init__(self, port = 9000, max_children = '32', max_data = '1024', max_depth = '1', timeout = 5, dedicatedtab = 1, minibufexpl = '0', debug = 0):
+  def __init__(self, port = 9000, max_children = '32', max_data = '1024', max_depth = '1', timeout = 5, dedicatedtab = 1, minibufexpl = '0', debug = 0, disablehelppane = 0):
     """ initialize Debugger """
     socket.setdefaulttimeout(timeout)
     self.port       = port
@@ -717,7 +720,7 @@ class Debugger:
 
     self.protocol   = DbgProtocol(self.port)
 
-    self.ui         = DebugUI(self, dedicatedtab, minibufexpl)
+    self.ui         = DebugUI(self, dedicatedtab, minibufexpl, disablehelppane)
     self.breakpt    = BreakPoint()
 
     vim.command('sign unplace *')
@@ -1135,8 +1138,10 @@ def debugger_init():
   dedicatedtab = int(vim.eval('debuggerDedicatedTab'))
 
   debug = int(vim.eval('debuggerDebugMode'))
+  
+  disablehelppane = int(vim.eval('debuggerDisableHelpPane'))
 
-  debugger  = Debugger(port, max_children, max_data, max_depth, timeout, dedicatedtab, minibufexpl, debug)
+  debugger  = Debugger(port, max_children, max_data, max_depth, timeout, dedicatedtab, minibufexpl, debug, disablehelppane)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
   try:

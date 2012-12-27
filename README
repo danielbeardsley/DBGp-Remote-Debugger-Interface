@@ -1,10 +1,11 @@
-Version 1.0.3.1
+Version 1.0.3.2
 
 Changes in this version
 - Fixed bug in viewing associative array names / children
 - Fixed bug in restoring MiniBufExplorer on quit
-- Removed mappings in .vim file for function keys (use your own)
+- Added a global flag to optionally disable default mappings (if you don't want the plugin to hijack function keys)
 - Added plugin folder support for Pathogen setups
+- Added a global flag to disable the help pane (since you've memorized your mappings and want more screen real estate)
 
 based on a fork from Hadi Zeftin
 https://github.com/vim-scripts/DBGp-Remote-Debugger-Interface

@@ -5,10 +5,18 @@
 "=============================================================================
 " Name Of File: debugger.vim, debugger.py
 "  Description: remote debugger client/interface to DBGp protocol
-"  Maintainer: Jared Cobb <github <at> jaredcobb.com>
-"  Last Change: December 26th 2012
-"          URL: http://www.vim.org/scripts/script.php?script_id=2508
-"      Version: 1.0.3
+"  Maintainer:  Jared Cobb <github <at> jaredcobb.com>
+"  Last Change: December 27th 2012
+"          URL: https://github.com/jaredcobb/DBGp-Remote-Debugger-Interface
+"      Version: 1.0.3.2
+"				
+"				Changelog for 1.0.3.2
+"				- Added default mappings back, but wrapping them in global flag
+"				- Added global flag to disable the help screen
+"				
+"				Changelog for 1.0.3.1
+"				- Made python script loader relative to plugin
+"				
 "				Changelog for 1.0.3
 "				- Fixed bug in viewing associative array names / children
 "				- Fixed bug in restoring MiniBufExplorer on quit
@@ -17,43 +25,57 @@
 "
 "				Forked by Hadi Zeftin <slack.dna <at> gmail.com>
 "				Changed on January 7, 2009
+"				at https://github.com/vim-scripts/DBGp-Remote-Debugger-Interface
+"				
 "               Originally written by Seung Woo Shin <segv <at> sayclub.com>
 "               at	http://www.vim.org/scripts/script.php?script_id=1152
-"               Developed by Sam Ghods <sam <at> box.net>
+"               
+"				Developed by Sam Ghods <sam <at> box.net>
 "               at http://www.vim.org/scripts/script.php?script_id=1929
 "        Usage: 
 "
 "				Map your preferred shortcuts to the following plugin functions
-"				(copy/paste these into your .vimrc, some people like F keys,
-"				I preferred leader keys)
-"				
-"				map <leader>1 :python debugger_resize()<cr>
-"				map <leader>2 :python debugger_command('step_into')<cr>
-"				map <leader>3 :python debugger_command('step_over')<cr>
-"				map <leader>4 :python debugger_command('step_out')<cr>
-"				map <leader>5 :python debugger_run()<cr>
-"				map <leader>6 :python debugger_quit<cr>
-"				map <leader>9 :python debugger_context()<cr>
-"				map <leader>0 :python debugger_property()<cr>
-"				map <leader>9 :python debugger_watch_input("context_get")<cr>A<cr>
-"				map <leader>0 :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
-"				map <leader>b :Bp<cr>
-"				
-"				OR
-"				
-"				map <F1> :python debugger_resize()<cr>
-"				map <F2> :python debugger_command('step_into')<cr>
-"				map <F3> :python debugger_command('step_over')<cr>
-"				map <F4> :python debugger_command('step_out')<cr>
-"				map <F5> :python debugger_run()<cr>
-"				map <F6> :python debugger_quit()<cr>
-"				map <F11> :python debugger_context()<cr>
-"				map <F12> :python debugger_property()<cr>
-"				map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
-"				map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
-"				map <leader>b :Bp<cr>
+"				(copy/paste the mappings below into your .vimrc, some people like 
+"				function keys, I preferred leader keys)
 "
-"               To set the socket waiting time before timeout(default 
+"				Then you can disable the default function key mappings (used in this 
+"				plugin) by setting the following flag in your vimrc:
+"				
+"				  let g:debuggerDisableDefaultMappings = 1
+"				
+"			  	  map <leader>1 :python debugger_resize()<cr>
+"				  map <leader>2 :python debugger_command('step_into')<cr>
+"				  map <leader>3 :python debugger_command('step_over')<cr>
+"				  map <leader>4 :python debugger_command('step_out')<cr>
+"				  map <leader>5 :python debugger_run()<cr>
+"				  map <leader>6 :python debugger_quit<cr>
+"				  map <leader>9 :python debugger_context()<cr>
+"				  map <leader>0 :python debugger_property()<cr>
+"				  map <leader>9 :python debugger_watch_input("context_get")<cr>A<cr>
+"				  map <leader>0 :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+"				  map <leader>b :Bp<cr>
+"				  map <leader>e :python debugger_watch_input("eval")<cr>A
+"				
+"				By default, the following keys are mapped automatically
+"				
+"				  map <F1> :python debugger_resize()<cr>
+"				  map <F2> :python debugger_command('step_into')<cr>
+"				  map <F3> :python debugger_command('step_over')<cr>
+"				  map <F4> :python debugger_command('step_out')<cr>
+"				  map <F5> :python debugger_run()<cr>
+"				  map <F6> :python debugger_quit()<cr>
+"				  map <F11> :python debugger_context()<cr>
+"				  map <F12> :python debugger_property()<cr>
+"				  map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
+"				  map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+"				  nnoremap ,e :python debugger_watch_input("eval")<cr>A
+"
+"               To disable the help pane from showing (since you've memorized your 
+"				shortcuts and want more screen real estate) set this flag:
+"				
+"				 let g:debuggerDisableHelpPane = 1
+"				
+"				To set the socket waiting time before timeout(default 
 "               10 second) use :
 "               
 "                 let g:debuggerTimeout = 10
@@ -165,8 +187,6 @@ else
   call confirm('debugger.vim: Unable to find debugger.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
 endif
 
-nnoremap ,e :python debugger_watch_input("eval")<cr>A
-
 "=============================================================================
 " Initialization
 "=============================================================================
@@ -202,6 +222,29 @@ if !exists('g:debuggerDedicatedTab')
 endif
 if !exists('g:debuggerDebugMode')
     let g:debuggerDebugMode = 0
+endif
+if !exists('g:debuggerDisableDefaultMappings')
+	let g:debuggerDisableDefaultMappings = 0
+endif
+if !exists('g:debuggerDisableHelpPane')
+	let g:debuggerDisableHelpPane = 0
+endif
+
+"=============================================================================
+" Setup default mappings if applicable
+"=============================================================================
+if g:debuggerDisableDefaultMappings == 0
+	map <F1> :python debugger_resize()<cr>
+	map <F2> :python debugger_command('step_into')<cr>
+	map <F3> :python debugger_command('step_over')<cr>
+	map <F4> :python debugger_command('step_out')<cr>
+	map <F5> :python debugger_run()<cr>
+	map <F6> :python debugger_quit()<cr>
+	map <F11> :python debugger_context()<cr>
+	map <F12> :python debugger_property()<cr>
+	map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
+	map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+	nnoremap ,e :python debugger_watch_input("eval")<cr>A
 endif
 
 "=============================================================================
