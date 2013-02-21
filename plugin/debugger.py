@@ -521,8 +521,6 @@ class DebugUI:
 
   def set_highlight(self):
     """ set vim highlight of debugger sign """
-    vim.command("highlight DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse")
-    vim.command("highlight DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse")
 
   def destroy(self):
     """ destroy windows """

@@ -190,11 +190,6 @@ endif
 "=============================================================================
 " Initialization
 "=============================================================================
-if !exists('g:customColors')
-  hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
-  hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
-endif
-
 command! -nargs=? Bp python debugger_mark('<args>')
 command! -nargs=0 Up python debugger_up()
 command! -nargs=0 Dn python debugger_down()
