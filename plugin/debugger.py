@@ -456,7 +456,6 @@ class DebugUI:
     self.create()
     vim.command('1wincmd w') # goto srcview window(nr=1, top-left)
     self.cursign = '1'
-    self.set_highlight()
 
   def store_session(self):
     if vim.eval("tabpagenr('$')") > 1:
@@ -495,7 +494,6 @@ class DebugUI:
     else: 
       self.restore_session()
 
-    self.set_highlight()
     self.file    = None
     self.line    = None
     self.mode    = 0
@@ -518,9 +516,6 @@ class DebugUI:
     self.stackwin.create('belowright new')
     if self.debugger.debug:
         self.tracewin.create('belowright new')
-
-  def set_highlight(self):
-    """ set vim highlight of debugger sign """
 
   def destroy(self):
     """ destroy windows """

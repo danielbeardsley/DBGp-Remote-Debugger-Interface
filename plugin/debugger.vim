@@ -6,10 +6,13 @@
 " Name Of File: debugger.vim, debugger.py
 "  Description: remote debugger client/interface to DBGp protocol
 "  Maintainer:  Jared Cobb <github <at> jaredcobb.com>
-"  Last Change: December 27th 2012
+"  Last Change: February 23rd 2013
 "          URL: https://github.com/jaredcobb/DBGp-Remote-Debugger-Interface
-"      Version: 1.0.3.2
+"      Version: 1.0.3.3
 "				
+"				Changelog for 1.0.3.3
+"				- Removed hard coded breakpoint colors, using a default scheme
+"
 "				Changelog for 1.0.3.2
 "				- Added default mappings back, but wrapping them in global flag
 "				- Added global flag to disable the help screen
@@ -72,6 +75,17 @@
 "
 "               To disable the help pane from showing (since you've memorized your 
 "				shortcuts and want more screen real estate) set this flag:
+"				
+"				 let g:debuggerDisableHelpPane = 1
+"
+"               To customize your breakpoint and current line highlighting
+"				simply define your highlighting in your vimrc like so and set
+"				the global flag useCustomColors = 1. (These are the defaults, 
+"				see :help hi for more info on what colors are possible)
+"
+"				 let g:useCustomColors = 1
+"				 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
+"				 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 "				
 "				 let g:debuggerDisableHelpPane = 1
 "				
@@ -193,6 +207,7 @@ endif
 command! -nargs=? Bp python debugger_mark('<args>')
 command! -nargs=0 Up python debugger_up()
 command! -nargs=0 Dn python debugger_down()
+
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
 
@@ -225,6 +240,10 @@ if !exists('g:debuggerDisableDefaultMappings')
 endif
 if !exists('g:debuggerDisableHelpPane')
 	let g:debuggerDisableHelpPane = 0
+endif
+if !exists('g:useCustomColors')
+  hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
+  hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 endif
 
 "=============================================================================
