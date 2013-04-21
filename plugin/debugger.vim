@@ -185,18 +185,18 @@
 "=============================================================================
 " check that everything is OK
 "=============================================================================
-if !has("python")
-    finish
+if !has("python3")
+  finish
 endif
 
 if filereadable(expand("<sfile>:p:h")."/debugger.py")
-  execute "pyfile " . expand("<sfile>:p:h")."/debugger.py"
+  execute "py3file " . expand("<sfile>:p:h")."/debugger.py"
 elseif filereadable($VIMRUNTIME."/plugin/debugger.py")
-  pyfile $VIMRUNTIME/plugin/debugger.py
+  py3file $VIMRUNTIME/plugin/debugger.py
 elseif filereadable($HOME."/.vim/plugin/debugger.py")
-  pyfile $HOME/.vim/plugin/debugger.py
+  py3file $HOME/.vim/plugin/debugger.py
 elseif filereadable($VIM."/vimfiles/plugin/debugger.py")
-  pyfile $VIM/vimfiles/plugin/debugger.py
+  py3file $VIM/vimfiles/plugin/debugger.py
 else
   call confirm('debugger.vim: Unable to find debugger.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
 endif
