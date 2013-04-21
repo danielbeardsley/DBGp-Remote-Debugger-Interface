@@ -235,8 +235,8 @@ class VimWindow:
       line = 'unknown node type'
 
     if node.hasChildNodes():
-      #print ''.ljust(level*4) + '{{{' + str(level+1)
-      #print ''.ljust(level*4) + line
+      #print(''.ljust(level*4) + '{{{' + str(level+1))
+      #print(''.ljust(level*4) + line)
       return self.fixup_childs(line, node, level)
     else:
       return self.fixup_single(line, node, level)
@@ -375,7 +375,7 @@ class WatchWindow(VimWindow):
   def get_command(self):
     line = self.buffer[-1]
     if line[0:17] == '/*{{{1*/ => exec:':
-      print "exec does not supported by xdebug now."
+      print("exec does not supported by xdebug now.")
       return ('none', '')
       #return ('exec', line[17:].strip(' '))
     elif line[0:17] == '/*{{{1*/ => eval:':
@@ -566,7 +566,7 @@ class DebugUI:
         else:
           self.tracewin.write(msg)
       except:
-        print "Unknown error while logging"
+        print("Unknown error while logging")
 
 
 class DbgProtocol:
@@ -579,7 +579,7 @@ class DbgProtocol:
     return self.isconned
   def accept(self):
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print 'waiting for a new connection on port '+str(self.port)+' for ' + str(int(serv.gettimeout())) + ' seconds...'
+    print('waiting for a new connection on port '+str(self.port)+' for ' + str(int(serv.gettimeout())) + ' seconds...')
     try:
       serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
       serv.bind(('', self.port))
@@ -589,7 +589,7 @@ class DbgProtocol:
       serv.close()
       raise ConnectionTimeoutException
 
-    print 'connection from ', address
+    print('connection from ', address)
     self.isconned = 1
     serv.close()
   def close(self):
@@ -598,14 +598,14 @@ class DbgProtocol:
       self.sock = None
     self.isconned = 0
   def recv_length(self):
-    #print '* recv len'
+    #print('* recv len')
     length = ''
     while 1:
       c = self.sock.recv(1)
       if c == '':
         self.close()
         raise EOFError, 'Socket Closed'
-      #print '  GET(',c, ':', ord(c), ') : length=', len(c)
+      #print('  GET(',c, ':', ord(c), ') : length=', len(c))
       if c == '\0':
         return int(length)
       if c.isdigit():
@@ -778,7 +778,7 @@ class Debugger:
       handler = getattr(self, 'handle_' + fc.tagName)
       handler(res)
     except AttributeError:
-      print 'Debugger.handle_'+fc.tagName+'() not found, please see the TRACE_WINDOW'
+      print('Debugger.handle_'+fc.tagName+'() not found, please see the TRACE_WINDOW')
     self.ui.go_srcview()
   def handle_response(self, res):
     """ call appropraite response message handler member function, handle_response_XXX() """
@@ -794,7 +794,7 @@ class Debugger:
     try:
       handler = getattr(self, 'handle_response_' + command)
     except AttributeError:
-      print 'Debugger.handle_response_'+command+'() not found, please see the LOG___WINDOW'
+      print('Debugger.handle_response_'+command+'() not found, please see the LOG___WINDOW')
       return
     handler(res)
     return
@@ -822,18 +822,18 @@ class Debugger:
   def handle_response_error(self, res):
     """ handle <error> tag """
     self.ui.trace(res, 1)
-#    print 'ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-#    print res.toprettyxml()
-#    print '------------------------------------'
+#    print('ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+#    print(res.toprettyxml())
+#    print('------------------------------------')
 #
 #    errors  = res.getElementsByTagName('error')
-#    #print 'list: ', len(errors), errors
+#    #print('list: ', len(errors), errors)
 #    if len(errors)>0:
 #      return
 #    for error in errors:
 #      code = error.getAttribute('code')
-#      print 'error code=', code
-#    print res
+#      print('error code=', code)
+#    print(res)
 
   def handle_response_stack_get(self, res):
     """handle <response command=stack_get> tag
@@ -869,7 +869,7 @@ class Debugger:
         self.status = res.firstChild.getAttribute('status')
       return
     else:
-      print res.toprettyxml()
+      print(res.toprettyxml())
   def handle_response_step_over(self, res):
     """handle <response command=step_over> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
@@ -878,7 +878,7 @@ class Debugger:
         self.status = res.firstChild.getAttribute('status')
       return
     else:
-      print res.toprettyxml()
+      print(res.toprettyxml())
   def handle_response_step_into(self, res):
     """handle <response command=step_into> tag
     <response command="step_into" reason="ok" status="break" transaction_id="1 "/>"""
@@ -887,7 +887,7 @@ class Debugger:
         self.status = res.firstChild.getAttribute('status')
       return
     else:
-      print res.toprettyxml()
+      print(res.toprettyxml())
   def handle_response_run(self, res):
     """handle <response command=run> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
@@ -904,7 +904,7 @@ class Debugger:
       self.breakpt.setid(bno, str(res.firstChild.getAttribute('id')))
       #try:
       #except:
-      #  print "can't find bptsetlst tid=", tid
+      #  print("can't find bptsetlst tid=", tid)
       #  pass
   def handle_response_eval(self, res):
     """handle <response command=eval> tag """
@@ -920,7 +920,7 @@ class Debugger:
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_default(self, res):
     """handle <response command=context_get> tag """
-    print res.toprettyxml()
+    print(res.toprettyxml())
   #
   #
   #################################################################################################################
@@ -984,7 +984,7 @@ class Debugger:
       self.ui.go_srcview()
 
   def quit(self):
-    #print "Debugger is stopping\n"
+    #print("Debugger is stopping\n")
     if self.running == 0:
       raise NotRunningException
 
@@ -1057,18 +1057,18 @@ class Debugger:
     (cmd, expr) = self.ui.watchwin.get_command()
     if cmd == 'exec':
       self.command('exec', '', expr)
-      print cmd, '--', expr
+      print(cmd, '--', expr)
     elif cmd == 'eval':
       self.command('eval', '', expr)
-      print cmd, '--', expr
+      print(cmd, '--', expr)
     elif cmd == 'property_get':
       self.command('property_get', '-d %d -n %s' % (self.curstack,  expr))
-      print cmd, '-n ', expr
+      print(cmd, '-n ', expr)
     elif cmd == 'context_get':
       self.command('context_get', ('-d %d' % self.curstack))
-      print cmd
+      print(cmd)
     else:
-      print "no commands", cmd, expr
+      print("no commands", cmd, expr)
 
 
   #
@@ -1094,7 +1094,7 @@ def unknown_exception_handler(msg = 'Unknown Exception, Connection closed, stop 
     debugger.ui.trace(sys.exc_info())
     debugger.ui.trace("".join(traceback.format_tb( sys.exc_info()[2])))
     debugger.stop()
-    print msg, sys.exc_info()
+    print(msg, sys.exc_info())
 
 
 def debugger_init():
@@ -1141,7 +1141,7 @@ def debugger_command(msg, arg1 = '', arg2 = ''):
     debugger.command(msg, arg1, arg2)
     debugger.command('stack_get')
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1149,9 +1149,9 @@ def debugger_run():
   try:
     debugger.run()
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except ConnectionTimeoutException:
-    print "Connection Timeout\n"
+    print("Connection Timeout\n")
   except:
     unknown_exception_handler()
 
@@ -1161,7 +1161,7 @@ def debugger_watch_input(cmd, arg = ''):
       arg = vim.eval('expand("<cword>")')
     debugger.watch_input(cmd, arg)
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1169,7 +1169,7 @@ def debugger_context():
   try:
     debugger.command('context_get')
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1177,7 +1177,7 @@ def debugger_property(name = ''):
   try:
     debugger.property_get()
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1191,7 +1191,7 @@ def debugger_up():
   try:
     debugger.up()
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1199,7 +1199,7 @@ def debugger_down():
   try:
     debugger.down()
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
@@ -1208,7 +1208,7 @@ def debugger_quit():
   try:
     debugger.quit()
   except NotRunningException:
-    print "Debugger is not running\n"
+    print("Debugger is not running\n")
   except:
     unknown_exception_handler()
 
