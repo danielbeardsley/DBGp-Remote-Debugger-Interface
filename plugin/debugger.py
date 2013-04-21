@@ -604,7 +604,7 @@ class DbgProtocol:
       c = self.sock.recv(1)
       if c == '':
         self.close()
-        raise EOFError, 'Socket Closed'
+        raise EOFError('Socket Closed')
       #print('  GET(',c, ':', ord(c), ') : length=', len(c))
       if c == '\0':
         return int(length)
@@ -615,7 +615,7 @@ class DbgProtocol:
       c = self.sock.recv(1)
       if c == '':
         self.close()
-        raise EOFError, 'Socket Closed'
+        raise EOFError('Socket Closed')
       if c == '\0':
         return
   def recv_body(self, to_recv):
@@ -624,7 +624,7 @@ class DbgProtocol:
       buf = self.sock.recv(to_recv)
       if buf == '':
         self.close()
-        raise EOFError, 'Socket Closed'
+        raise EOFError('Socket Closed')
       to_recv -= len(buf)
       body = body + buf
     return body
